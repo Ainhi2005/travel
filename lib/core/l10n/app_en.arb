@@ -1,0 +1,41 @@
+{
+  "appName": "Sesan Travel",
+  "all": "All",
+  "featured": "Featured",
+  "popularTours": "Popular Tours",
+  "viewAll": "View All",
+  "tabUnderDevelopment": "Screen for tab {index} is under development",
+  "@tabUnderDevelopment": {
+    "description": "A message shown when a tab is under construction",
+    "placeholders": {
+      "index": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "home": "Home",
+  "tours": "Tours",
+  "profile": "Profile",
+  "discover": "DISCOVER",
+  "amazingThings": "AMAZING THINGS",
+  "heroSubtitle": "Your journey, our memory",
+  "whereToGo": "Where do you want to go?",
+  "dailyTours": "Daily Tours",
+  "packageTours": "Package Tours",
+  "privateTours": "Private Tours",
+  "seeMore": "See More",
+  "searchTours": "Search tours...",
+  "explore": "Explore",
+  "noToursFound": "No tours found.",
+  "errorOccurred": "An error occurred: {error}",
+  "@errorOccurred": {
+    "description": "Error message with error detail",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "allTours": "All Tours"
+}

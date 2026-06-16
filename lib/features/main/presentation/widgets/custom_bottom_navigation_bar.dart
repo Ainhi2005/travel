@@ -1,5 +1,6 @@
 import 'package:sesan_travel/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:sesan_travel/core/l10n/app_localizations.dart';
 
 class CustomBottomNavigationBar extends StatelessWidget {
   final int currentIndex;
@@ -34,6 +35,8 @@ class CustomBottomNavigationBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       // 3. Vùng chứa tạo bo góc trên và bóng (shadow)
       decoration: BoxDecoration(
@@ -69,17 +72,17 @@ class CustomBottomNavigationBar extends StatelessWidget {
             BottomNavigationBarItem(
               icon: _buildIcon('assets/images/house.png'),
               activeIcon: _buildActiveIcon('assets/images/house.png'), // Dùng icon có box xám
-              label: 'Trang chủ',
+              label: l10n.home,
             ),
             BottomNavigationBarItem(
               icon: _buildIcon('assets/images/tour.png'),
               activeIcon: _buildActiveIcon('assets/images/tour.png'),
-              label: 'Chuyến đi',
+              label: l10n.tours,
             ),
             BottomNavigationBarItem(
               icon: _buildIcon('assets/images/profile.png'),
               activeIcon: _buildActiveIcon('assets/images/profile.png'),
-              label: 'Cá nhân',
+              label: l10n.profile,
             ),
           ],
         ),

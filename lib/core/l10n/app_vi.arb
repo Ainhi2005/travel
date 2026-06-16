@@ -1,0 +1,41 @@
+{
+  "appName": "Sesan Travel",
+  "all": "Tất cả",
+  "featured": "Nổi bật",
+  "popularTours": "Tour Phổ Biến",
+  "viewAll": "Xem Tất cả",
+  "tabUnderDevelopment": "Màn hình của tab {index} đang phát triển",
+  "@tabUnderDevelopment": {
+    "description": "Thông báo hiển thị khi tab đang được xây dựng",
+    "placeholders": {
+      "index": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "home": "Trang chủ",
+  "tours": "Chuyến đi",
+  "profile": "Cá nhân",
+  "discover": "KHÁM PHÁ",
+  "amazingThings": "ĐIỀU TUYỆT VỜI",
+  "heroSubtitle": "Hành trình của bạn, ký ức của chúng tôi",
+  "whereToGo": "Bạn muốn đi đâu?",
+  "dailyTours": "Tour Hằng ngày",
+  "packageTours": "Tour trọn gói",
+  "privateTours": "Tour riêng tư",
+  "seeMore": "Xem thêm",
+  "searchTours": "Tìm kiếm tour du lịch...",
+  "explore": "Khám phá",
+  "noToursFound": "Không có dữ liệu tour.",
+  "errorOccurred": "Đã có lỗi xảy ra: {error}",
+  "@errorOccurred": {
+    "description": "Thông báo lỗi kèm chi tiết",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "allTours": "Tất cả Tour"
+}

@@ -1,17 +1,20 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:sesan_travel/core/l10n/app_localizations.dart';
 import 'package:sesan_travel/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:sesan_travel/features/home/presentation/pages/home_page.dart';
 import 'package:sesan_travel/features/main/presentation/widgets/custom_bottom_navigation_bar.dart';
 import 'package:sesan_travel/features/tour/presentation/pages/tour_page.dart';
+import 'package:sesan_travel/core/providers/locale_provider.dart';
 
-class MainPage extends StatefulWidget {
+class MainPage extends ConsumerStatefulWidget {
   const MainPage({super.key});
 
   @override
-  State<MainPage> createState() => _MainPageState();
+  ConsumerState<MainPage> createState() => _MainPageState();
 }
 
-class _MainPageState extends State<MainPage> {
+class _MainPageState extends ConsumerState<MainPage> {
   int _selectedIndex = 0;
 
   void _onItemTapped(int index) {
@@ -22,6 +25,9 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final currentLocale = ref.watch(localeProvider);
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.white,
@@ -60,6 +66,37 @@ class _MainPageState extends State<MainPage> {
         ),
         centerTitle: false,
         actions: [
+          // Language Switcher
+          GestureDetector(
+            onTap: () {
+              ref.read(localeProvider.notifier).toggleLocale();
+            },
+            child: Container(
+              margin: const EdgeInsets.symmetric(vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(
+                color: AppColors.border,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: AppColors.neutral.withOpacity(0.1)),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.language, size: 16, color: AppColors.neutral),
+                  const SizedBox(width: 6),
+                  Text(
+                    currentLocale.languageCode.toUpperCase(),
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.neutral,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
           IconButton(
             onPressed: () {},
             icon: Stack(
@@ -92,7 +129,7 @@ class _MainPageState extends State<MainPage> {
           : _selectedIndex == 1
               ? const TourPage()
               : Center(
-                  child: Text('Màn hình của tab $_selectedIndex đang phát triển'),
+                  child: Text(l10n.tabUnderDevelopment(_selectedIndex)),
                 ),
       bottomNavigationBar: CustomBottomNavigationBar(
         currentIndex: _selectedIndex,

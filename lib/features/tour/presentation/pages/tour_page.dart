@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:sesan_travel/core/l10n/app_localizations.dart';
 import 'package:sesan_travel/features/tour/presentation/widgets/filter_chip_widget.dart';
 import 'package:sesan_travel/features/tour/presentation/widgets/tour_card_widget.dart';
 import 'package:sesan_travel/core/widgets/custom_search_bar.dart';
@@ -15,13 +16,14 @@ class TourPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final selectedType = ref.watch(selectedTourTypeProvider);
     final toursAsyncValue = ref.watch(toursProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(height: 16),
         // Search Bar
-        const CustomSearchBar(hintText: 'Tìm kiếm tour du lịch...'),
+        CustomSearchBar(hintText: l10n.searchTours),
         const SizedBox(height: 16),
         // Filter Chips
         SingleChildScrollView(
@@ -30,22 +32,22 @@ class TourPage extends ConsumerWidget {
           child: Row(
             children: [
               FilterChipWidget(
-                label: 'Tất cả',
+                label: l10n.all,
                 isActive: selectedType == TourType.all,
                 onTap: () => ref.read(selectedTourTypeProvider.notifier).updateType(TourType.all),
               ),
               FilterChipWidget(
-                label: 'Tour Hàng ngày',
+                label: l10n.dailyTours,
                 isActive: selectedType == TourType.daily,
                 onTap: () => ref.read(selectedTourTypeProvider.notifier).updateType(TourType.daily),
               ),
               FilterChipWidget(
-                label: 'Tour Trọn Gói',
+                label: l10n.packageTours,
                 isActive: selectedType == TourType.package,
                 onTap: () => ref.read(selectedTourTypeProvider.notifier).updateType(TourType.package),
               ),
               FilterChipWidget(
-                label: 'Tour Riêng Tư',
+                label: l10n.privateTours,
                 isActive: selectedType == TourType.private,
                 onTap: () => ref.read(selectedTourTypeProvider.notifier).updateType(TourType.private),
               ),
@@ -54,11 +56,11 @@ class TourPage extends ConsumerWidget {
         ),
         const SizedBox(height: 24),
         // Title
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16.0),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: Text(
-            'Khám phá',
-            style: TextStyle(
+            l10n.explore,
+            style: const TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.bold,
               color: AppColors.neutral,
@@ -71,7 +73,7 @@ class TourPage extends ConsumerWidget {
           child: toursAsyncValue.when(
             data: (tours) {
               if (tours.isEmpty) {
-                return const Center(child: Text('Không có dữ liệu tour.'));
+                return Center(child: Text(l10n.noToursFound));
               }
               return ListView.builder(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
@@ -103,7 +105,7 @@ class TourPage extends ConsumerWidget {
               );
             },
             loading: () => const Center(child: CircularProgressIndicator(color: AppColors.primary)),
-            error: (error, stack) => Center(child: Text('Đã có lỗi xảy ra: $error')),
+            error: (error, stack) => Center(child: Text(l10n.errorOccurred(error.toString()))),
           ),
         ),
       ],

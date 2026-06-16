@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:sesan_travel/core/l10n/app_localizations.dart';
 import 'package:sesan_travel/features/tour/presentation/providers/tour_providers.dart';
 import 'package:sesan_travel/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
@@ -24,6 +25,8 @@ class _HomeHeroWidgetState extends ConsumerState<HomeHeroWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Stack(
       clipBehavior: Clip.none,
       children: [
@@ -54,18 +57,18 @@ class _HomeHeroWidgetState extends ConsumerState<HomeHeroWidget> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 10),
-                const Text(
-                  'KHÁM PHÁ',
-                  style: TextStyle(
+                Text(
+                  l10n.discover,
+                  style: const TextStyle(
                     color: AppColors.white,
                     fontSize: 32,
                     fontWeight: FontWeight.w900,
                     height: 1.1,
                   ),
                 ),
-                const Text(
-                  'ĐIỀU TUYỆT VỜI',
-                  style: TextStyle(
+                Text(
+                  l10n.amazingThings,
+                  style: const TextStyle(
                     color: AppColors.primary, // Orange
                     fontSize: 32,
                     fontWeight: FontWeight.w900,
@@ -73,9 +76,9 @@ class _HomeHeroWidgetState extends ConsumerState<HomeHeroWidget> {
                   ),
                 ),
                 const SizedBox(height: 8),
-                const Text(
-                  'Hành trình của bạn, ký ức của chúng tôi',
-                  style: TextStyle(
+                Text(
+                  l10n.heroSubtitle,
+                  style: const TextStyle(
                     color: AppColors.white,
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
@@ -101,15 +104,15 @@ class _HomeHeroWidgetState extends ConsumerState<HomeHeroWidget> {
                         Expanded(
                           child: TextField(
                             focusNode: _searchFocusNode,
-                            decoration: const InputDecoration(
-                              hintText: 'Bạn muốn đi đâu?',
-                              hintStyle: TextStyle(
+                            decoration: InputDecoration(
+                              hintText: l10n.whereToGo,
+                              hintStyle: const TextStyle(
                                 color: AppColors.textSecondary,
                                 fontSize: 14,
                               ),
                               border: InputBorder.none,
                               isDense: true,
-                              contentPadding: EdgeInsets.symmetric(vertical: 8),
+                              contentPadding: const EdgeInsets.symmetric(vertical: 8),
                             ),
                           ),
                         ),
@@ -151,19 +154,19 @@ class _HomeHeroWidgetState extends ConsumerState<HomeHeroWidget> {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildCategoryItem('assets/images/DAILYGROUPTOURS.png', 'Tour Hằng ngày', () {
+                _buildCategoryItem('assets/images/DAILYGROUPTOURS.png', l10n.dailyTours, () {
                   ref.read(selectedTourTypeProvider.notifier).updateType(TourType.daily);
                   context.push('/all-tour');
                 }),
-                _buildCategoryItem('assets/images/PACKAGETOURS.png', 'Tour trọn gói', () {
+                _buildCategoryItem('assets/images/PACKAGETOURS.png', l10n.packageTours, () {
                   ref.read(selectedTourTypeProvider.notifier).updateType(TourType.package);
                   context.push('/all-tour');
                 }),
-                _buildCategoryItem('assets/images/PRIVATETOURS.png', 'Tour riêng tư', () {
+                _buildCategoryItem('assets/images/PRIVATETOURS.png', l10n.privateTours, () {
                    ref.read(selectedTourTypeProvider.notifier).updateType(TourType.private);
                    context.push('/all-tour');
                 }),
-                _buildCategoryItem('assets/images/more.png', 'Xem thêm', () {
+                _buildCategoryItem('assets/images/more.png', l10n.seeMore, () {
                   ref.read(selectedTourTypeProvider.notifier).updateType(TourType.all);
                   context.push('/all-tour');
                 }),
