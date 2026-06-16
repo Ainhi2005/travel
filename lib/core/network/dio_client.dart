@@ -1,13 +1,12 @@
 import 'package:dio/dio.dart';
+import '../constants/api_constants.dart';
 
 class DioClient {
   final Dio dio;
 
   DioClient() : dio = Dio(
     BaseOptions(
-      // Chú ý: Dùng 10.0.2.2 cho máy ảo Android, dùng 127.0.0.1 cho iOS/Web/Windows.
-      // Tạm thời dùng 127.0.0.1 theo yêu cầu.
-      baseUrl: 'http://127.0.0.1:3658/m1/1312864-1312865-default',
+      baseUrl: ApiConstants.baseUrl,
       connectTimeout: const Duration(seconds: 10),
       receiveTimeout: const Duration(seconds: 10),
       headers: {

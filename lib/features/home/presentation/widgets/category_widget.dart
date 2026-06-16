@@ -1,3 +1,4 @@
+import 'package:sesan_travel/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 
 class CategoryWidget extends StatelessWidget {
@@ -5,8 +6,6 @@ class CategoryWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final int user = 1;
-    final int admin = 2;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Row(
@@ -33,23 +32,7 @@ class CategoryWidget extends StatelessWidget {
               print('Tour riêng tư');
             },
           ),
-          if (user == 5) ...[
-            _buildCategoryItem(
-              icon: Icons.directions_car,
-              label: 'Admin',
-              onTap: () {
-                print('Admin');
-              },
-            ),
-          ] else ...[
-            _buildCategoryItem(
-              icon: Icons.directions_car,
-              label: 'Thuê xe',
-              onTap: () {
-                print('Thuê xe');
-              },
-            ),
-          ],
+          
         ],
       ),
     );
@@ -68,17 +51,17 @@ class CategoryWidget extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Colors.blue.shade50,
+              color: AppColors.primary.withOpacity(0.1),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(icon, color: Colors.blue.shade700, size: 24),
+            child: Icon(icon, color: AppColors.primary, size: 24),
           ),
           const SizedBox(height: 8),
           Text(
             label,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 12,
-              color: Colors.grey.shade700,
+              color: AppColors.textSecondary,
               fontWeight: FontWeight.w500,
             ),
           ),
