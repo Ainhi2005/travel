@@ -1,8 +1,26 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/> <!-- Android 13 trở lên -->
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/> <!-- Android 12 trở lên -->
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM"/> <!-- Android 12 trở lên -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/> <!-- Android 11 trở lên -->
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
     <application
         android:label="sesan_travel"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
+
+        <receiver android:exported="false"
+            android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+            </intent-filter>
+        </receiver>
+
+        <receiver android:exported="false"
+            android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true"

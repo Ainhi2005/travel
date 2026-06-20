@@ -15,7 +15,7 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
-        
+
         // CHUYỂN DÒNG ĐÓ XUỐNG ĐÂY (nhớ có thêm chữ "is" ở đầu nha Nhi)
         isCoreLibraryDesugaringEnabled = true
     }
@@ -26,15 +26,17 @@ android {
 
     defaultConfig {
         applicationId = "com.example.sesan_travel"
-        minSdk = flutter.minSdkVersion
-        targetSdk = flutter.targetSdkVersion
+        minSdk = flutter.minSdkVersion // 21
+        targetSdk = flutter.targetSdkVersion  // 34
         versionCode = flutter.versionCode
         versionName = flutter.versionName
-        
+
         // GIỮ LẠI DÒNG NÀY Ở ĐÂY:
-        multiDexEnabled = true 
+        multiDexEnabled = true
     }
-    
+
+
+
     // ... các phần còn lại giữ nguyên
 }
 

@@ -9,10 +9,14 @@ import 'package:sesan_travel/core/constants/app_config.dart';
 import 'package:sesan_travel/core/providers/locale_provider.dart';
 import 'package:sesan_travel/core/routes/app_router.dart';
 import 'package:sesan_travel/firebase_options.dart';
+import 'package:sesan_travel/features/notifications/service/local_notification_service.dart';
+
+final localNotificationService = LocalNotificationService();
 
 void main() async {
   // Chú ý
   WidgetsFlutterBinding.ensureInitialized();
+  await localNotificationService.init();
   try {
     // 2. Khởi tạo Firebase bằng cấu hình tự động từ CLI
     await Firebase.initializeApp(
