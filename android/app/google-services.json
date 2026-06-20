@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "471194165642",
+    "project_id": "sesan-travel",
+    "storage_bucket": "sesan-travel.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:471194165642:android:274a246df1241f079aa873",
+        "android_client_info": {
+          "package_name": "com.example.sesan_travel"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAfBkQNHxShMuSLRrYpJI7PMcWaYJkVsvk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

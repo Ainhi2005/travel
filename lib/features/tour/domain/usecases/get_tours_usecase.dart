@@ -6,7 +6,8 @@ class GetToursUseCase {
 
   GetToursUseCase(this.repository);
 
-  Future<List<TourEntity>> call(TourType type) {
-    return repository.getTours(type);
+ Future<List<TourEntity>> call(TourType type, {int page = 1, int limit = 3}) {
+    // Truyền tiếp xuống repository
+    return repository.getTours(type, page: page, limit: limit);
   }
 }

@@ -9,37 +9,65 @@ import 'package:sesan_travel/features/home/presentation/widgets/tour_list_widget
 import 'package:sesan_travel/features/tour/presentation/providers/tour_providers.dart';
 
 import '../../../tour/domain/repositories/tour_repository.dart';
-class HomePage extends StatelessWidget {
+class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
+
+  @override
+  ConsumerState<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends ConsumerState<HomePage> {
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200) {
+        ref.read(toursProvider.notifier).fetchNextPage();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          const HomeHeroWidget(),
-          const SizedBox(height: 52), // Space cho phần card đè lên ảnh
-          SectionHeaderWidget(title: l10n.featured),
-          const SizedBox(height: 12),
-          const HomeSliderWidget(),
-          const SizedBox(height: 12),
-          Consumer(
-            builder: (context, ref, child) {
-              return SectionHeaderWidget(
-                title: l10n.popularTours,
-                actionText: l10n.viewAll,
-                onActionTap: () {
-                  ref.read(selectedTourTypeProvider.notifier).updateType(TourType.all);
-                  context.push('/all-tour');
-                },
-              );
-            }
-          ),
-          const SizedBox(height: 12),
-          const TourListWidget(),
-        ],
+    return RefreshIndicator(
+      onRefresh: () => ref.read(toursProvider.notifier).refresh(),
+      child: SingleChildScrollView(
+        controller: _scrollController,
+        physics: const AlwaysScrollableScrollPhysics(), // Quan trọng để RefreshIndicator hoạt động được
+        child: Column(
+          children: [
+            const HomeHeroWidget(),
+            const SizedBox(height: 52), // Space cho phần card đè lên ảnh
+            SectionHeaderWidget(title: l10n.featured),
+            const SizedBox(height: 12),
+            const HomeSliderWidget(),
+            const SizedBox(height: 12),
+            Consumer(
+              builder: (context, ref, child) {
+                return SectionHeaderWidget(
+                  title: l10n.popularTours,
+                  actionText: l10n.viewAll,
+                  onActionTap: () {
+                    ref.read(selectedTourTypeProvider.notifier).updateType(TourType.all);
+                    context.push('/all-tour');
+                  },
+                );
+              }
+            ),
+            const SizedBox(height: 12),
+            const TourListScreen(),
+          ],
+        ),
       ),
     );
   }

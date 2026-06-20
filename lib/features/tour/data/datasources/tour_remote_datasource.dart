@@ -4,7 +4,7 @@ import '../../domain/repositories/tour_repository.dart';
 import '../models/tour_model.dart';
 
 abstract class TourRemoteDataSource {
-  Future<List<TourModel>> fetchTours(TourType type);
+  Future<List<TourModel>> fetchTours(TourType type, {int page = 1, int limit = 3});
 }
 
 class TourRemoteDataSourceImpl implements TourRemoteDataSource {
@@ -13,7 +13,7 @@ class TourRemoteDataSourceImpl implements TourRemoteDataSource {
   TourRemoteDataSourceImpl({required this.apiClient});
 
   @override
-  Future<List<TourModel>> fetchTours(TourType type) async {
+  Future<List<TourModel>> fetchTours(TourType type, {int page = 1, int limit = 3}) async {
     String endpoint = '';
     
     switch (type) {
@@ -56,4 +56,5 @@ class TourRemoteDataSourceImpl implements TourRemoteDataSource {
       throw Exception('Dữ liệu trả về không hợp lệ (Không phải là danh sách)');
     }
   }
+  
 }

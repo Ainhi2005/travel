@@ -8,9 +8,9 @@ class TourRepositoryImpl implements TourRepository {
   TourRepositoryImpl({required this.remoteDataSource});
 
   @override
-  Future<List<TourEntity>> getTours(TourType type) async {
+  Future<List<TourEntity>> getTours(TourType type, {int page = 1, int limit = 3}) async {
     try {
-      final models = await remoteDataSource.fetchTours(type);
+      final models = await remoteDataSource.fetchTours(type, page: page, limit: limit);
       return models;
     } catch (e) {
        rethrow;

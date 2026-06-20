@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:sesan_travel/core/l10n/app_localizations.dart';
@@ -7,10 +8,20 @@ import 'package:sesan_travel/core/config/env_config.dart';
 import 'package:sesan_travel/core/constants/app_config.dart';
 import 'package:sesan_travel/core/providers/locale_provider.dart';
 import 'package:sesan_travel/core/routes/app_router.dart';
+import 'package:sesan_travel/firebase_options.dart';
 
 void main() async {
   // Chú ý
   WidgetsFlutterBinding.ensureInitialized();
+  try {
+    // 2. Khởi tạo Firebase bằng cấu hình tự động từ CLI
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    print("🎉 KẾT NỐI FIREBASE THÀNH CÔNG RỒI ƠI! 🎉");
+  } catch (e) {
+    print("❌ LỖI KẾT NỐI FIREBASE: $e");
+  }
   const env = String.fromEnvironment('env', defaultValue: 'dev');
   await dotenv.load(fileName: ".env.$env");
 
@@ -39,7 +50,7 @@ class MyApp extends ConsumerWidget {
 
     return MaterialApp.router(
       title: config.appName,
-      debugShowCheckedModeBanner: config.showDebugBanner,
+      debugShowCheckedModeBanner: false,
       routerConfig: appRouter,
       locale: locale,
       localizationsDelegates: const [

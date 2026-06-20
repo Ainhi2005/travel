@@ -8,5 +8,5 @@ enum TourType {
 }
 
 abstract class TourRepository {
-  Future<List<TourEntity>> getTours(TourType type);
+  Future<List<TourEntity>> getTours(TourType type, {int page = 1, int limit = 3});
 }
