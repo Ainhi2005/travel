@@ -1,6 +1,7 @@
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'dart:developer' as developer;
+
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class LocalNotificationService {
   final FlutterLocalNotificationsPlugin _notificationsPlugin =
@@ -53,21 +54,35 @@ class LocalNotificationService {
       badge: true,
       sound: true,
     );
-    developer.log('Quyền thông báo Firebase: ${settings.authorizationStatus}', name: 'NotificationService');
+    developer.log(
+      'Quyền thông báo Firebase: ${settings.authorizationStatus}',
+      name: 'NotificationService',
+    );
 
     // 2. Lấy FCM Token và hiển thị ra log để copy
     try {
       String? token = await messaging.getToken();
-      developer.log('====================================================', name: 'NotificationService');
+
+      developer.log(
+        '====================================================',
+        name: 'NotificationService',
+      );
       developer.log('🔥 FCM TOKEN: $token', name: 'NotificationService');
-      developer.log('====================================================', name: 'NotificationService');
+
+      developer.log(
+        '====================================================',
+        name: 'NotificationService',
+      );
     } catch (e) {
       developer.log('Lỗi lấy FCM Token: $e', name: 'NotificationService');
     }
 
     // 3. Lắng nghe tin nhắn khi app đang mở (Foreground)
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      developer.log('Nhận FCM ở foreground: ${message.notification?.title}', name: 'NotificationService');
+      developer.log(
+        'Nhận FCM ở foreground: ${message.notification?.title}',
+        name: 'NotificationService',
+      );
       if (message.notification != null) {
         showNotification(
           title: message.notification!.title ?? '',
@@ -79,7 +94,10 @@ class LocalNotificationService {
 
     // 4. Lắng nghe khi click vào thông báo từ background
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      developer.log('Nhấn vào thông báo FCM: ${message.notification?.title}', name: 'NotificationService');
+      developer.log(
+        'Nhấn vào thông báo FCM: ${message.notification?.title}',
+        name: 'NotificationService',
+      );
     });
   }
 
