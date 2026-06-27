@@ -2,15 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sesan_travel/core/l10n/app_localizations.dart';
-import 'package:sesan_travel/core/widgets/primary_button.dart';
 import 'package:sesan_travel/core/widgets/section_header_widget.dart';
 import 'package:sesan_travel/features/home/presentation/widgets/home_hero_widget.dart';
 import 'package:sesan_travel/features/home/presentation/widgets/home_slider_widget.dart';
 import 'package:sesan_travel/features/home/presentation/widgets/tour_list_widget.dart';
 import 'package:sesan_travel/features/tour/presentation/providers/tour_providers.dart';
-import 'package:sesan_travel/main.dart';
-
-import '../../../tour/domain/repositories/tour_repository.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
@@ -55,15 +51,15 @@ class _HomePageState extends ConsumerState<HomePage> {
             const SizedBox(height: 16),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: PrimaryButton(
-                text: 'Thông đơn hàng thành công',
-                onPressed: () async {
-                  await localNotificationService.showNotification(
-                    title: 'Thông báo đặt tour thành công',
-                    body: 'Chúc mừng bạn đã đặt tour thành công!',
-                  );
-                },
-              ),
+              // child: PrimaryButton(
+              //   text: 'Thông đơn hàng thành công',
+              //   onPressed: () async {
+              //     await localNotificationService.showNotification(
+              //       title: 'Thông báo đặt tour thành công',
+              //       body: 'Chúc mừng bạn đã đặt tour thành công!',
+              //     );
+              //   },
+              // ),
             ),
 
             const SizedBox(height: 36), // Space cho phần card đè lên ảnh
@@ -78,8 +74,8 @@ class _HomePageState extends ConsumerState<HomePage> {
                   actionText: l10n.viewAll,
                   onActionTap: () {
                     ref
-                        .read(selectedTourTypeProvider.notifier)
-                        .updateType(TourType.all);
+                        .read(selectedTourCategoryProvider.notifier)
+                        .state = null;
                     context.push('/all-tour');
                   },
                 );

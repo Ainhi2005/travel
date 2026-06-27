@@ -1,0 +1,617 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Tour API",
+    "description": "API quản lý danh mục và tour du lịch. Base URL production: https://teach-lilac.vercel.app",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://teach-lilac.vercel.app",
+      "description": "Production (Vercel)"
+    },
+    {
+      "url": "http://localhost:3000",
+      "description": "Local Development"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Categories",
+      "description": "Danh mục tour du lịch"
+    },
+    {
+      "name": "Tours",
+      "description": "Tour du lịch"
+    }
+  ],
+  "paths": {
+    "/api/categories": {
+      "get": {
+        "tags": ["Categories"],
+        "summary": "Lấy danh sách danh mục",
+        "description": "Trả về tất cả danh mục tour, sắp xếp theo sort_order tăng dần.",
+        "operationId": "getCategories",
+        "responses": {
+          "200": {
+            "description": "Thành công",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "message": { "type": "string", "example": "Categories retrieved successfully" },
+                    "data": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/Category" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Categories"],
+        "summary": "Tạo mới danh mục",
+        "description": "Thêm danh mục mới. Trường slug được tự động sinh từ name.",
+        "operationId": "createCategory",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CategoryInput" },
+              "example": {
+                "name": "Du lịch núi",
+                "description": "Khám phá rừng núi kì vĩ",
+                "image": "https://example.com/mountain.jpg",
+                "status": "active",
+                "sort_order": 2
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Tạo thành công",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean", "example": true },
+                    "message": { "type": "string" },
+                    "data": { "$ref": "#/components/schemas/Category" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/categories/{id}": {
+      "get": {
+        "tags": ["Categories"],
+        "summary": "Chi tiết danh mục",
+        "description": "Lấy thông tin chi tiết một danh mục theo ID.",
+        "operationId": "getCategoryById",
+        "parameters": [
+          { "$ref": "#/components/parameters/CategoryId" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Thành công",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "message": { "type": "string" },
+                    "data": { "$ref": "#/components/schemas/Category" }
+                  }
+                }
+              }
+            }
+          },
+          "404": { "description": "Không tìm thấy danh mục" }
+        }
+      },
+      "put": {
+        "tags": ["Categories"],
+        "summary": "Cập nhật danh mục",
+        "description": "Cập nhật thông tin danh mục. Nếu cập nhật name thì slug sẽ tự động được tạo mới.",
+        "operationId": "updateCategory",
+        "parameters": [
+          { "$ref": "#/components/parameters/CategoryId" }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CategoryInput" },
+              "example": {
+                "name": "Du lịch vùng cao",
+                "sort_order": 3
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Cập nhật thành công",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "message": { "type": "string" },
+                    "data": { "$ref": "#/components/schemas/Category" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Categories"],
+        "summary": "Xóa danh mục",
+        "description": "Xóa danh mục theo ID. Lưu ý: các tour thuộc danh mục sẽ bị xóa theo (CASCADE).",
+        "operationId": "deleteCategory",
+        "parameters": [
+          { "$ref": "#/components/parameters/CategoryId" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Xóa thành công",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "message": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/tours": {
+      "get": {
+        "tags": ["Tours"],
+        "summary": "Lấy danh sách tour",
+        "description": "Trả về danh sách tour kèm thông tin danh mục. Hỗ trợ sắp xếp và lọc theo category.",
+        "operationId": "getTours",
+        "parameters": [
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Sắp xếp theo rating giảm dần",
+            "schema": { "type": "string", "enum": ["rating"] }
+          },
+          {
+            "name": "category_id",
+            "in": "query",
+            "description": "Lọc theo ID danh mục",
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Thành công",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "message": { "type": "string" },
+                    "data": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/TourWithCategory" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Tours"],
+        "summary": "Tạo mới tour",
+        "description": "Thêm tour du lịch mới.",
+        "operationId": "createTour",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/TourInput" },
+              "example": {
+                "category_id": "a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d",
+                "title": "Tour Đà Lạt mộng mơ",
+                "description": "Tour nghỉ dưỡng lý tưởng tại thành phố sương mù",
+                "price": 1850000,
+                "duration": "3N2Đ",
+                "location": "Đà Lạt",
+                "image": "https://example.com/dalat.jpg",
+                "max_people": 25,
+                "status": "active",
+                "rating": 4.5
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Tạo thành công",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "message": { "type": "string" },
+                    "data": { "$ref": "#/components/schemas/TourWithCategory" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/tours/search": {
+      "get": {
+        "tags": ["Tours"],
+        "summary": "Tìm kiếm tour",
+        "description": "Tìm kiếm không phân biệt hoa/thường theo title, location hoặc description.",
+        "operationId": "searchTours",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": true,
+            "description": "Từ khóa tìm kiếm",
+            "schema": { "type": "string" },
+            "example": "Nha Trang"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Thành công",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "message": { "type": "string" },
+                    "data": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/TourWithCategory" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/tours/filter": {
+      "get": {
+        "tags": ["Tours"],
+        "summary": "Bộ lọc nâng cao",
+        "description": "Kết hợp nhiều điều kiện lọc. Không truyền tham số sẽ trả về tất cả tour.",
+        "operationId": "filterTours",
+        "parameters": [
+          {
+            "name": "category_id",
+            "in": "query",
+            "description": "Lọc theo ID danh mục",
+            "schema": { "type": "string", "format": "uuid" }
+          },
+          {
+            "name": "minPrice",
+            "in": "query",
+            "description": "Giá tối thiểu (>=)",
+            "schema": { "type": "number", "example": 1000000 }
+          },
+          {
+            "name": "maxPrice",
+            "in": "query",
+            "description": "Giá tối đa (<=)",
+            "schema": { "type": "number", "example": 3000000 }
+          },
+          {
+            "name": "location",
+            "in": "query",
+            "description": "Tìm gần đúng theo địa điểm",
+            "schema": { "type": "string", "example": "Đà Lạt" }
+          },
+          {
+            "name": "duration",
+            "in": "query",
+            "description": "Tìm gần đúng theo thời gian",
+            "schema": { "type": "string", "example": "3N" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Thành công",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "message": { "type": "string" },
+                    "data": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/TourWithCategory" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/tours/featured": {
+      "get": {
+        "tags": ["Tours"],
+        "summary": "Tour nổi bật",
+        "description": "Trả về tối đa 10 tour được sắp xếp theo rating giảm dần.",
+        "operationId": "getFeaturedTours",
+        "responses": {
+          "200": {
+            "description": "Thành công",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "message": { "type": "string" },
+                    "data": {
+                      "type": "array",
+                      "maxItems": 10,
+                      "items": { "$ref": "#/components/schemas/TourWithCategory" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/tours/category/{categoryId}": {
+      "get": {
+        "tags": ["Tours"],
+        "summary": "Tour theo danh mục",
+        "description": "Lấy danh sách tour thuộc một danh mục cụ thể.",
+        "operationId": "getToursByCategory",
+        "parameters": [
+          {
+            "name": "categoryId",
+            "in": "path",
+            "required": true,
+            "description": "ID danh mục",
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Thành công",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "message": { "type": "string" },
+                    "data": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/TourWithCategory" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/tours/{id}": {
+      "get": {
+        "tags": ["Tours"],
+        "summary": "Chi tiết tour",
+        "description": "Lấy thông tin chi tiết một tour kèm thông tin danh mục.",
+        "operationId": "getTourById",
+        "parameters": [
+          { "$ref": "#/components/parameters/TourId" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Thành công",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "message": { "type": "string" },
+                    "data": { "$ref": "#/components/schemas/TourWithCategory" }
+                  }
+                }
+              }
+            }
+          },
+          "404": { "description": "Không tìm thấy tour" }
+        }
+      },
+      "put": {
+        "tags": ["Tours"],
+        "summary": "Cập nhật tour",
+        "description": "Cập nhật thông tin tour. Chỉ cần gửi các trường muốn thay đổi.",
+        "operationId": "updateTour",
+        "parameters": [
+          { "$ref": "#/components/parameters/TourId" }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/TourInput" },
+              "example": {
+                "price": 1900000,
+                "max_people": 30
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Cập nhật thành công",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "message": { "type": "string" },
+                    "data": { "$ref": "#/components/schemas/TourWithCategory" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Tours"],
+        "summary": "Xóa tour",
+        "description": "Xóa tour theo ID.",
+        "operationId": "deleteTour",
+        "parameters": [
+          { "$ref": "#/components/parameters/TourId" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Xóa thành công",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "message": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "parameters": {
+      "CategoryId": {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "description": "UUID của danh mục",
+        "schema": { "type": "string", "format": "uuid" }
+      },
+      "TourId": {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "description": "UUID của tour",
+        "schema": { "type": "string", "format": "uuid" }
+      }
+    },
+    "schemas": {
+      "Category": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid", "example": "a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d" },
+          "name": { "type": "string", "example": "Du lịch biển" },
+          "slug": { "type": "string", "example": "du-lich-bien" },
+          "description": { "type": "string", "example": "Các tour tham quan nghỉ dưỡng tại bãi biển" },
+          "image": { "type": "string", "format": "uri", "example": "https://example.com/images/beach.jpg" },
+          "status": { "type": "string", "enum": ["active", "inactive"], "example": "active" },
+          "sort_order": { "type": "integer", "example": 1 },
+          "created_at": { "type": "string", "format": "date-time" },
+          "updated_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "CategoryInput": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string", "example": "Du lịch núi" },
+          "description": { "type": "string", "example": "Khám phá rừng núi kì vĩ" },
+          "image": { "type": "string", "format": "uri", "example": "https://example.com/mountain.jpg" },
+          "status": { "type": "string", "enum": ["active", "inactive"], "example": "active" },
+          "sort_order": { "type": "integer", "example": 2 }
+        }
+      },
+      "TourWithCategory": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid", "example": "e98a27b4-1e24-4f2e-a50d-85f20658fa99" },
+          "category_id": { "type": "string", "format": "uuid" },
+          "title": { "type": "string", "example": "Tour Phú Quốc 3N2Đ" },
+          "slug": { "type": "string", "example": "tour-phu-quoc-3n2d" },
+          "description": { "type": "string", "example": "Trải nghiệm lặn ngắm san hô..." },
+          "price": { "type": "number", "example": 3200000 },
+          "duration": { "type": "string", "example": "3N2Đ" },
+          "location": { "type": "string", "example": "Phú Quốc" },
+          "image": { "type": "string", "format": "uri", "example": "https://example.com/phuquoc.jpg" },
+          "max_people": { "type": "integer", "example": 15 },
+          "status": { "type": "string", "enum": ["active", "inactive"], "example": "active" },
+          "rating": { "type": "number", "format": "float", "minimum": 0, "maximum": 5, "example": 4.9 },
+          "created_at": { "type": "string", "format": "date-time" },
+          "updated_at": { "type": "string", "format": "date-time" },
+          "category": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string", "format": "uuid" },
+              "name": { "type": "string" },
+              "slug": { "type": "string" },
+              "description": { "type": "string" },
+              "image": { "type": "string", "format": "uri" }
+            }
+          }
+        }
+      },
+      "TourInput": {
+        "type": "object",
+        "properties": {
+          "category_id": { "type": "string", "format": "uuid", "example": "a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d" },
+          "title": { "type": "string", "example": "Tour Đà Lạt mộng mơ" },
+          "description": { "type": "string", "example": "Tour nghỉ dưỡng lý tưởng tại thành phố sương mù" },
+          "price": { "type": "number", "example": 1850000 },
+          "duration": { "type": "string", "example": "3N2Đ" },
+          "location": { "type": "string", "example": "Đà Lạt" },
+          "image": { "type": "string", "format": "uri", "example": "https://example.com/dalat.jpg" },
+          "max_people": { "type": "integer", "example": 25 },
+          "status": { "type": "string", "enum": ["active", "inactive"], "example": "active" },
+          "rating": { "type": "number", "format": "float", "minimum": 0, "maximum": 5, "example": 4.5 }
+        }
+      }
+    }
+  }
+}

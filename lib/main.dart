@@ -16,13 +16,15 @@ final localNotificationService = LocalNotificationService();
 void main() async {
   // Chú ý
   WidgetsFlutterBinding.ensureInitialized();
-  await localNotificationService.init();
   try {
     // 2. Khởi tạo Firebase bằng cấu hình tự động từ CLI
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
     print("🎉 KẾT NỐI FIREBASE THÀNH CÔNG RỒI ƠI! 🎉");
+    
+    // 3. Khởi tạo thông báo sau khi Firebase đã kết nối thành công
+    await localNotificationService.init();
   } catch (e) {
     print("❌ LỖI KẾT NỐI FIREBASE: $e");
   }

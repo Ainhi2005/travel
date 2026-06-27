@@ -1,69 +1,37 @@
+import '../../../category/domain/entities/category_entity.dart';
+
 class TourEntity {
   final String id;
+  final String categoryId;
+  final String title;
   final String slug;
-  final String tenTour;
-  final MoTa moTa;
-  final Gia gia;
-  final ThoiGianDi thoiGianDi;
-  final List<dynamic> lichTrinh; 
-  final List<String> giaBaoGom;
-  final List<String> hinhAnh;
-  final String danhMuc;
-  final String diaDiem;
-  final double soSao;
-  final int soLuotDanhGia;
-  final String? urlGoc;
+  final String description;
+  final num price;
+  final String duration;
+  final String location;
+  final String image;
+  final int maxPeople;
+  final String status;
+  final num rating;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
+  final CategoryEntity? category;
 
   TourEntity({
     required this.id,
+    required this.categoryId,
+    required this.title,
     required this.slug,
-    required this.tenTour,
-    required this.moTa,
-    required this.gia,
-    required this.thoiGianDi,
-    required this.lichTrinh,
-    required this.giaBaoGom,
-    required this.hinhAnh,
-    required this.danhMuc,
-    required this.diaDiem,
-    required this.soSao,
-    required this.soLuotDanhGia,
-    this.urlGoc,
-  });
-}
-
-class MoTa {
-  final String tongQuan;
-  final List<String> diemNoiBat;
-
-  MoTa({
-    required this.tongQuan,
-    required this.diemNoiBat,
-  });
-}
-
-class Gia {
-  final num nguoiLon;
-  final num treEm;
-  final String donViTienTe;
-
-  Gia({
-    required this.nguoiLon,
-    required this.treEm,
-    required this.donViTienTe,
-  });
-}
-
-class ThoiGianDi {
-  final String loaiTour;
-  final String gioBatDau;
-  final String gioKetThuc;
-  final String xuatPhat;
-
-  ThoiGianDi({
-    required this.loaiTour,
-    required this.gioBatDau,
-    required this.gioKetThuc,
-    required this.xuatPhat,
+    required this.description,
+    required this.price,
+    required this.duration,
+    required this.location,
+    required this.image,
+    required this.maxPeople,
+    required this.status,
+    required this.rating,
+    this.createdAt,
+    this.updatedAt,
+    this.category,
   });
 }

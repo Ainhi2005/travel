@@ -8,6 +8,8 @@ class TourCardWidget extends StatelessWidget {
   final String title;
   final String description;
   final VoidCallback? onTap;
+  final VoidCallback? onEdit;
+  final VoidCallback? onDelete;
 
   const TourCardWidget({
     super.key,
@@ -17,6 +19,8 @@ class TourCardWidget extends StatelessWidget {
     required this.title,
     required this.description,
     this.onTap,
+    this.onEdit,
+    this.onDelete,
   });
 
   @override
@@ -64,25 +68,57 @@ class TourCardWidget extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    RichText(
-                      text: TextSpan(
-                        text: 'Price from ',
-                        style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
-                        children: [
-                          TextSpan(
-                            text: priceUsd,
-                            style: const TextStyle(
-                              color: AppColors.primary,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14,
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: RichText(
+                            text: TextSpan(
+                              text: 'Price from ',
+                              style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
+                              children: [
+                                TextSpan(
+                                  text: priceUsd,
+                                  style: const TextStyle(
+                                    color: AppColors.primary,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: ' / $priceVnd',
+                                  style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
+                                ),
+                              ],
                             ),
                           ),
-                          TextSpan(
-                            text: ' / $priceVnd',
-                            style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
+                        ),
+                        SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: PopupMenuButton<String>(
+                            padding: EdgeInsets.zero,
+                            icon: const Icon(Icons.more_vert, size: 20, color: AppColors.textSecondary),
+                            onSelected: (value) {
+                              if (value == 'edit') {
+                                onEdit?.call();
+                              } else if (value == 'delete') {
+                                onDelete?.call();
+                              }
+                            },
+                            itemBuilder: (context) => [
+                              const PopupMenuItem(
+                                value: 'edit',
+                                child: Text('Sửa'),
+                              ),
+                              const PopupMenuItem(
+                                value: 'delete',
+                                child: Text('Xóa'),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 8),
                     Text(

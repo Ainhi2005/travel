@@ -1,188 +1,100 @@
 import 'package:flutter/material.dart';
-import 'package:sesan_travel/core/widgets/circular_back_button.dart';
-import 'package:sesan_travel/core/widgets/primary_button.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:sesan_travel/features/tour/domain/entities/tour_entity.dart';
+import 'package:sesan_travel/features/tour/presentation/providers/tour_providers.dart';
 import 'package:sesan_travel/core/theme/app_colors.dart';
 
-class TourDetailPage extends StatelessWidget {
+import '../widgets/tour_image_header_widget.dart';
+import '../widgets/tour_content_sheet_widget.dart';
+import '../widgets/tour_sticky_bottom_bar_widget.dart';
+
+class TourDetailPage extends ConsumerWidget {
   final TourEntity tour;
 
   const TourDetailPage({super.key, required this.tour});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final priceNum = tour.price.toDouble();
+    final formattedPrice = '${priceNum.toStringAsFixed(0).replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]}.')} VND';
+    final categoryName = tour.category?.name ?? 'Tour Hàng Ngày';
+    
+    final desc = (tour.description.isEmpty) 
+      ? 'chưa có mô tả'
+      : tour.description;
+
     return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: const Text('Chi tiết tour', style: TextStyle(color: AppColors.neutral)),
-        backgroundColor: AppColors.white,
-        elevation: 0,
-        iconTheme: const IconThemeData(color: AppColors.neutral),
-      ),
-      body: Stack(
-        children: [
-          SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Banner Image with Back Button
-                Stack(
-                  children: [
-                    Image.network(
-                      tour.hinhAnh.isNotEmpty ? tour.hinhAnh.first : 'https://via.placeholder.com/400',
-                      height: 250,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => Container(
-                        height: 250,
-                        color: AppColors.border,
-                        child: const Center(child: Icon(Icons.image, size: 50, color: AppColors.textSecondary)),
-                      ),
+      backgroundColor: AppColors.white,
+      body: SizedBox.expand(
+        child: Stack(
+          children: [
+            // 1. Ảnh bìa (Nằm dưới cùng)
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: TourImageBackground(imageUrl: tour.image),
+          ),
+
+          // 2. Nội dung chi tiết cuộn (Bottom Sheet Style)
+          Positioned.fill(
+            child: SingleChildScrollView(
+              physics: const ClampingScrollPhysics(),
+              child: Column(
+                children: [
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.4 - 24),
+                  TourContentSheet(
+                    tour: tour,
+                    categoryName: categoryName,
+                    formattedPrice: formattedPrice,
+                    description: desc,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          
+          // 3. Nút Back và Bookmark (Nổi lên trên cùng, không bị đè bởi ScrollView)
+          TourTopButtons(
+            onEdit: () {
+              context.push('/tour-form', extra: tour);
+            },
+            onDelete: () async {
+              final confirm = await showDialog<bool>(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: const Text('Xác nhận xóa'),
+                  content: const Text('Bạn có chắc chắn muốn xóa tour này không?'),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, false),
+                      child: const Text('Hủy'),
                     ),
-                    const Positioned(
-                      top: 16,
-                      left: 16,
-                      child: CircularBackButton(),
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, true),
+                      child: const Text('Xóa', style: TextStyle(color: Colors.red)),
                     ),
                   ],
                 ),
-                // Content
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Title
-                      Text(
-                        tour.tenTour,
-                        style: const TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.w900,
-                          color: AppColors.neutral,
-                          height: 1.2,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      // Date and Price
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: Text(
-                              'Khởi hành: ${tour.thoiGianDi.xuatPhat.isNotEmpty ? tour.thoiGianDi.xuatPhat : 'Hàng ngày'}',
-                              style: const TextStyle(
-                                fontSize: 14,
-                                color: AppColors.textSecondary,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          Text(
-                            'Giá: ${tour.gia.nguoiLon} ${tour.gia.donViTienTe}',
-                            style: const TextStyle(
-                              fontSize: 20,
-                              color: AppColors.primary,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 24),
-                      // Chi tiết tour
-                      const Text(
-                        'Chi tiết tour',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.neutral,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        tour.moTa.tongQuan,
-                        style: const TextStyle(
-                          fontSize: 15,
-                          color: AppColors.neutral,
-                          height: 1.5,
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                      // Lịch trình
-                      const Text(
-                        'Lịch trình',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.neutral,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      ...tour.lichTrinh.map((item) {
-                        if (item is Map) {
-                          if (item.containsKey('thoi_gian')) {
-                            return Padding(
-                              padding: const EdgeInsets.only(bottom: 8.0),
-                              child: _buildScheduleItem('${item['thoi_gian']}: ', item['hoat_dong'] ?? ''),
-                            );
-                          } else if (item.containsKey('ngay')) {
-                            // Xử lý nhiều ngày (demo đơn giản)
-                            return Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text('${item['ngay']}: ${item['tieu_de']}', style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.neutral)),
-                                const SizedBox(height: 4),
-                                ...(item['chi_tiet'] as List? ?? []).map((ct) => Padding(
-                                  padding: const EdgeInsets.only(bottom: 4.0, left: 8.0),
-                                  child: _buildScheduleItem('${ct['thoi_gian']}: ', ct['hoat_dong'] ?? ''),
-                                )).toList(),
-                                const SizedBox(height: 8),
-                              ],
-                            );
-                          }
-                        }
-                        return const SizedBox.shrink();
-                      }),
-                      
-                      const SizedBox(height: 100), // Space for floating button
-                    ],
-                  ),
-                ),
-              ],
-            ),
+              );
+              if (confirm == true) {
+                ref.read(toursProvider.notifier).deleteTour(tour.id);
+                if (context.mounted) context.pop();
+              }
+            },
           ),
-          // Floating "Đặt ngay" Button
+          
+          // 4. Thanh đặt hàng cố định (Sticky Bottom Bar)
           Positioned(
-            bottom: 16,
-            left: 16,
-            right: 16,
-            child: PrimaryButton(
-              text: 'Đặt ngay',
-              onPressed: () {},
-            ),
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: StickyBottomBar(formattedPrice: formattedPrice),
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildScheduleItem(String time, String detail) {
-    return RichText(
-      text: TextSpan(
-        style: const TextStyle(
-          fontSize: 15,
-          color: AppColors.neutral,
-          height: 1.5,
-        ),
-        children: [
-          TextSpan(
-            text: time,
-            style: const TextStyle(fontWeight: FontWeight.bold),
-          ),
-          TextSpan(text: detail),
-        ],
-      ),
+    )
     );
   }
 }

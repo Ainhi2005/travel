@@ -1,60 +1,88 @@
-import '../../../../core/network/api_client.dart';
 import '../../../../core/constants/api_constants.dart';
-import '../../domain/repositories/tour_repository.dart';
-import '../models/tour_model.dart';
+import '../../../../core/network/api_client.dart';
+import '../models/tour_response_model.dart';
+import '../models/tour_request_model.dart';
+import '../../domain/entities/tour_filter_entity.dart';
 
 abstract class TourRemoteDataSource {
-  Future<List<TourModel>> fetchTours(TourType type, {int page = 1, int limit = 3});
+  Future<List<TourResponseModel>> getTours({
+    TourFilterEntity? filter,
+    String? sort,
+    int page = 1,
+    int limit = 10,
+  });
+  Future<List<TourResponseModel>> searchTours(String query);
+  Future<List<TourResponseModel>> getFeaturedTours();
+  Future<TourResponseModel> createTour(TourRequestModel request);
+  Future<TourResponseModel> updateTour(String id, TourRequestModel request);
+  Future<void> deleteTour(String id);
 }
 
 class TourRemoteDataSourceImpl implements TourRemoteDataSource {
   final ApiClient apiClient;
-
   TourRemoteDataSourceImpl({required this.apiClient});
 
   @override
-  Future<List<TourModel>> fetchTours(TourType type, {int page = 1, int limit = 3}) async {
-    String endpoint = '';
+  Future<List<TourResponseModel>> getTours({
+    TourFilterEntity? filter, 
+    String? sort, 
+    int page = 1, 
+    int limit = 3
+  }) async {
+    // Sử dụng chung 1 API /filter cho cả lọc và lấy tất cả để đồng nhất kết quả
+    final String endpoint = ApiConstants.filterTours;
     
-    switch (type) {
-      case TourType.daily:
-        endpoint = ApiConstants.dailyTours;
-        break;
-      case TourType.package:
-        endpoint = ApiConstants.packageTours;
-        break;
-      case TourType.private:
-        endpoint = ApiConstants.privateTours;
-        break;
-      case TourType.all:
-        endpoint = ApiConstants.getAll;
-        break;
+    final Map<String, dynamic> queryParams = {
+      "page": page,
+      "limit": limit,
+      if (sort != null) "sort": sort,
+    };
+    
+    if (filter != null) {
+      if (filter.categoryId != null) queryParams["category_id"] = filter.categoryId;
+      if (filter.minPrice != null) queryParams["minPrice"] = filter.minPrice;
+      if (filter.maxPrice != null) queryParams["maxPrice"] = filter.maxPrice;
+      if (filter.location != null && filter.location!.isNotEmpty) queryParams["location"] = filter.location;
+      if (filter.duration != null && filter.duration!.isNotEmpty) queryParams["duration"] = filter.duration;
     }
 
-    final responseData = await apiClient.get(endpoint);    
-    // Xử lý linh hoạt: Đôi khi API trả về trực tiếp một mảng List [...], 
-    // đôi khi lại trả về một Object dạng Map { "data": [...] }
-    dynamic data = responseData;
-    if (data is Map<String, dynamic>) {
-      if (data.containsKey('data')) {
-        data = data['data'];
-      } else {
-        // Nếu API bọc list ở một key khác, ta thử tìm key chứa list
-        final listValues = data.values.whereType<List>();
-        if (listValues.isNotEmpty) {
-          data = listValues.first;
-        } else {
-          // Trả về mảng rỗng nếu không có dữ liệu để tránh crash
-          data = [];
-        }
-      }
-    }
-
-    if (data is List) {
-      return data.map((e) => TourModel.fromJson(e as Map<String, dynamic>)).toList();
-    } else {
-      throw Exception('Dữ liệu trả về không hợp lệ (Không phải là danh sách)');
-    }
+    final response = await apiClient.get(endpoint, queryParameters: queryParams);
+    
+    final json = response['data'] as List<dynamic>;
+    return json.map((e) => TourResponseModel.fromJson(e as Map<String, dynamic>)).toList();
   }
-  
+
+  @override
+  Future<List<TourResponseModel>> searchTours(String query) async {
+    final response = await apiClient.get(
+      ApiConstants.searchTours,
+      queryParameters: {"q": query},
+    );
+    final json = response['data'] as List<dynamic>;
+    return json.map((e) => TourResponseModel.fromJson(e as Map<String, dynamic>)).toList();
+  }
+
+  @override
+  Future<List<TourResponseModel>> getFeaturedTours() async {
+    final response = await apiClient.get(ApiConstants.featuredTours);
+    final json = response['data'] as List<dynamic>;
+    return json.map((e) => TourResponseModel.fromJson(e as Map<String, dynamic>)).toList();
+  }
+
+  @override
+  Future<TourResponseModel> createTour(TourRequestModel request) async {
+    final response = await apiClient.post(ApiConstants.tours, data: request.toJson());
+    return TourResponseModel.fromJson(response['data']);
+  }
+
+  @override
+  Future<TourResponseModel> updateTour(String id, TourRequestModel request) async {
+    final response = await apiClient.put('${ApiConstants.tours}/$id', data: request.toJson());
+    return TourResponseModel.fromJson(response['data']);
+  }
+
+  @override
+  Future<void> deleteTour(String id) async {
+    await apiClient.delete('${ApiConstants.tours}/$id');
+  }
 }

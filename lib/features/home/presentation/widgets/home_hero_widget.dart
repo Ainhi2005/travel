@@ -1,26 +1,32 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
-import 'package:sesan_travel/core/l10n/app_localizations.dart';
-import 'package:sesan_travel/features/tour/presentation/providers/tour_providers.dart';
-import 'package:sesan_travel/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:sesan_travel/core/l10n/app_localizations.dart';
+import 'package:sesan_travel/core/theme/app_colors.dart';
 
-import '../../../tour/domain/repositories/tour_repository.dart';
+import '../../../category/presentation/widgets/category_card_widget.dart';
+import 'package:go_router/go_router.dart';
 
-class HomeHeroWidget extends ConsumerStatefulWidget {
+// hiển thị baner+ search+ category
+class HomeHeroWidget extends StatefulWidget {
   const HomeHeroWidget({super.key});
 
   @override
-  ConsumerState<HomeHeroWidget> createState() => _HomeHeroWidgetState();
+  State<HomeHeroWidget> createState() => _HomeHeroWidgetState();
 }
 
-class _HomeHeroWidgetState extends ConsumerState<HomeHeroWidget> {
-  final FocusNode _searchFocusNode = FocusNode();
+class _HomeHeroWidgetState extends State<HomeHeroWidget> {
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void dispose() {
-    _searchFocusNode.dispose();
+    _searchController.dispose();
     super.dispose();
+  }
+
+  void _onSearch() {
+    final query = _searchController.text.trim();
+    if (query.isNotEmpty) {
+      context.push('/search-tour?q=$query');
+    }
   }
 
   @override
@@ -30,101 +36,75 @@ class _HomeHeroWidgetState extends ConsumerState<HomeHeroWidget> {
     return Stack(
       clipBehavior: Clip.none,
       children: [
-        // Background Image
         Container(
           height: 280,
           width: double.infinity,
           decoration: const BoxDecoration(
             image: DecorationImage(
-              image: AssetImage('assets/images/banner.jpg'),
+              image: AssetImage(
+                'assets/images/banner.jpg',
+              ),
               fit: BoxFit.cover,
             ),
           ),
+
           child: Container(
-            // Dark gradient overlay to make text readable
+            padding: const EdgeInsets.all(20),
+            // Lớp phủ tối
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  AppColors.neutral.withOpacity(0.4),
-                  AppColors.neutral.withOpacity(0.6),
-                ],
-              ),
+              color: Colors.black.withOpacity(0.4),
             ),
-            padding: const EdgeInsets.only(left: 20, right: 20, top: 20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(height: 10),
+                const SizedBox(height: 20),
                 Text(
                   l10n.discover,
                   style: const TextStyle(
                     color: AppColors.white,
                     fontSize: 32,
-                    fontWeight: FontWeight.w900,
-                    height: 1.1,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
                 Text(
                   l10n.amazingThings,
                   style: const TextStyle(
-                    color: AppColors.primary, // Orange
+                    color: AppColors.primary,
                     fontSize: 32,
-                    fontWeight: FontWeight.w900,
-                    height: 1.1,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 10),
                 Text(
                   l10n.heroSubtitle,
                   style: const TextStyle(
                     color: AppColors.white,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
                   ),
                 ),
-                const SizedBox(height: 24),
-                // Search Bar
-                GestureDetector(
-                  onTap: () {
-                    _searchFocusNode.requestFocus();
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: AppColors.white,
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    child: Row(
-                      children: [
-                        const SizedBox(width: 8),
-                        const Icon(Icons.location_on_outlined, color: AppColors.textSecondary),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: TextField(
-                            focusNode: _searchFocusNode,
-                            decoration: InputDecoration(
-                              hintText: l10n.whereToGo,
-                              hintStyle: const TextStyle(
-                                color: AppColors.textSecondary,
-                                fontSize: 14,
-                              ),
-                              border: InputBorder.none,
-                              isDense: true,
-                              contentPadding: const EdgeInsets.symmetric(vertical: 8),
-                            ),
-                          ),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.all(10),
-                          decoration: const BoxDecoration(
-                            color: AppColors.primary, // Orange
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(Icons.search, color: AppColors.white, size: 20),
-                        ),
-                      ],
+                const SizedBox(height: 15),
+                // Search
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.white,
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  child: TextField(
+                    controller: _searchController,
+                    textInputAction: TextInputAction.search,
+                    onSubmitted: (_) => _onSearch(),
+                    decoration: InputDecoration(
+                      hintText: l10n.whereToGo,
+                      border: InputBorder.none,
+                      icon: const Icon(
+                        Icons.location_on_outlined,
+                      ),
+                      suffixIcon: IconButton(
+                        icon: const Icon(Icons.search, color: AppColors.primary),
+                        onPressed: _onSearch,
+                      ),
                     ),
                   ),
                 ),
@@ -132,80 +112,14 @@ class _HomeHeroWidgetState extends ConsumerState<HomeHeroWidget> {
             ),
           ),
         ),
-        // Overlapping Category Card
-        Positioned(
+
+        const Positioned(
           left: 16,
           right: 16,
-          bottom: -40,
-          child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
-            decoration: BoxDecoration(
-              color: AppColors.white,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.neutral.withOpacity(0.1),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildCategoryItem('assets/images/DAILYGROUPTOURS.png', l10n.dailyTours, () {
-                  ref.read(selectedTourTypeProvider.notifier).updateType(TourType.daily);
-                  context.push('/all-tour');
-                }),
-                _buildCategoryItem('assets/images/PACKAGETOURS.png', l10n.packageTours, () {
-                  ref.read(selectedTourTypeProvider.notifier).updateType(TourType.package);
-                  context.push('/all-tour');
-                }),
-                _buildCategoryItem('assets/images/PRIVATETOURS.png', l10n.privateTours, () {
-                   ref.read(selectedTourTypeProvider.notifier).updateType(TourType.private);
-                   context.push('/all-tour');
-                }),
-                _buildCategoryItem('assets/images/more.png', l10n.seeMore, () {
-                  ref.read(selectedTourTypeProvider.notifier).updateType(TourType.all);
-                  context.push('/all-tour');
-                }),
-              ],
-            ),
-          ),
+          bottom: -50,
+          child: CategoryCardWidget(),
         ),
       ],
-    );
-  }
-
-  Widget _buildCategoryItem(String imagePath, String label, VoidCallback onTap) {
-    return Expanded(
-      child: GestureDetector(
-        onTap: onTap,
-        behavior: HitTestBehavior.opaque,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Image.asset(
-              imagePath,
-              width: 32,
-              height: 32,
-              fit: BoxFit.contain,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              label,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
-                color: AppColors.neutral,
-                height: 1.2,
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

@@ -4,11 +4,13 @@ import 'package:flutter/material.dart';
 class PrimaryButton extends StatelessWidget {
   final String text;
   final VoidCallback onPressed;
+  final IconData? icon;
 
   const PrimaryButton({
     super.key,
     required this.text,
     required this.onPressed,
+    this.icon,
   });
 
   @override
@@ -24,12 +26,22 @@ class PrimaryButton extends StatelessWidget {
         ),
         elevation: 4,
       ),
-      child: Text(
-        text,
-        style: const TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.bold,
-        ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          if (icon != null) ...[
+            Icon(icon, size: 20),
+            const SizedBox(width: 8),
+          ],
+          Text(
+            text,
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
       ),
     );
   }

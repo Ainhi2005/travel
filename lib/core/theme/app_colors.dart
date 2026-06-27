@@ -5,7 +5,8 @@ class AppColors {
   static const Color primary = Color(0xFFF77F00); // Cam
   static const Color secondary = Color(0xFF003049); // Xanh đen đậm
   static const Color tertiary = Color(0XFF006B5C); // Xanh ngọc đậm (Bottom Nav)
-  static const Color neutral = Color(0xFF222222); // Đen mềm cho text
+  static const Color neutral = Color(0xFF222222); 
+  static const Color black = Color.fromARGB(255, 0, 0, 0);// Đen mềm cho text
 
   static const Color background = Color(0xFFF9FAF8);
   static const Color card = Colors.white;
