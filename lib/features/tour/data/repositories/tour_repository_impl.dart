@@ -26,7 +26,7 @@ class TourRepositoryImpl implements TourRepository {
       );
       return models;
     } catch (e) {
-       rethrow;
+      rethrow;
     }
   }
 
@@ -52,11 +52,11 @@ class TourRepositoryImpl implements TourRepository {
 
   @override
   Future<TourEntity> createTour(TourRequestEntity request) async {
-    try{
-      final requestModel=TourRequestModel.fromEntity(request);
-      final result=await remoteDataSource.createTour(requestModel);
-      return result;      
-    } catch (e){
+    try {
+      final requestModel = TourRequestModel.fromEntity(request);
+      final result = await remoteDataSource.createTour(requestModel);
+      return result;
+    } catch (e) {
       throw Exception(e.toString());
     }
   }
@@ -65,7 +65,7 @@ class TourRepositoryImpl implements TourRepository {
   Future<TourEntity> updateTour(String id, TourRequestEntity request) async {
     try {
       final requestModel = TourRequestModel.fromEntity(request);
-      final result= await remoteDataSource.updateTour(id, requestModel);
+      final result = await remoteDataSource.updateTour(id, requestModel);
       // Dummy return
       return result;
     } catch (e) {
